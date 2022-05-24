@@ -52,28 +52,34 @@ async function getGasPrice(env, source, destination, tokenAddress) {
 function getSaltFromKey(key) {
     return keccak256(defaultAbiCoder.encode(['string'], [key]));
 }
-async function deployContractConstant(deployerContractAddress, wallet, contract, key, args = []) {
-    const deployerContract = new Contract(deployerContractAddress, ConstAddressDeployer.abi, wallet);
-    const salt = getSaltFromKey(key);
-    const factory = new ContractFactory(
-        contract.abi,
-        contract.bytecode
-    );
-    const bytecode = (await factory.getDeployTransaction(...args)).data;
+async function deployContractConstant(deployerContractAddress, wallet, contractJson, key, args = [], initArgs = []) {
+  const deployerContract = new Contract(deployerContractAddress, ConstAddressDeployer.abi, wallet);
+  const salt = getSaltFromKey(key);
+  const factory = new ContractFactory(
+      contractJson.abi,
+      contractJson.bytecode
+  );
+  const bytecode = factory.getDeployTransaction(...args).data;
+  const address = await deployerContract.deployedAddress(bytecode, salt);
+  const contract = new Contract(address, contractJson.abi, wallet);
+  if(initArgs == []) { 
     await (await deployerContract.connect(wallet).deploy(bytecode, salt)).wait();
-    const address = await deployerContract.predict(bytecode, salt);
-    return new Contract(address, contract.abi, wallet);
-  };
-  async function predictContractConstant (deployerContractAddress, wallet, contract, key, args = []) {
-    const deployerContract = new Contract(deployerContractAddress, ConstAddressDeployer.abi, wallet);
-    const salt = getSaltFromKey(key);
-    const factory = new ContractFactory(
-        contract.abi,
-        contract.bytecode
-    );
-    const bytecode = (await factory.getDeployTransaction(...args)).data;
-    return await deployerContract.predict(bytecode, salt);
-  };
+  } else {
+    const initData = (await contract.populateTransaction.init(...initArgs)).data;
+    await (await deployerContract.connect(wallet).deployAndInit(bytecode, salt, initData)).wait();
+  }
+  return contract;
+};
+async function predictContractConstant (deployerContractAddress, wallet, contractJson, key, args = []) {
+  const deployerContract = new Contract(deployerContractAddress, ConstAddressDeployer.abi, wallet);
+  const salt = getSaltFromKey(key);
+  const factory = new ContractFactory(
+      contractJson.abi,
+      contractJson.bytecode
+  );
+  const bytecode = factory.getDeployTransaction(...args).data;
+  return await deployerContract.deployedAddress(bytecode, salt);
+};
 
 module.exports = {
     getGasPrice,
