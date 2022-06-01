@@ -24,6 +24,7 @@
     "uuid": "^8.3.2"
   },
   "devDependencies": {
+    "axelar-utils-solidity": "github:axelarnetwork/axelar-utils-solidity",
     "eth-proof": "^2.1.6",
     "leveldown": "^6.1.1",
     "levelup": "^5.1.1",

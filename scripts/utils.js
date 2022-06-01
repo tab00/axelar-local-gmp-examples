@@ -66,7 +66,7 @@ async function deployContractConstant(deployerContractAddress, wallet, contractJ
     await (await deployerContract.connect(wallet).deploy(bytecode, salt)).wait();
   } else {
     const initData = (await contract.populateTransaction.init(...initArgs)).data;
-    await (await deployerContract.connect(wallet).deployAndInit(bytecode, salt, initData)).wait();
+    await (await deployerContract.connect(wallet).deployAndInit(bytecode, salt, initData, {gasLimit: 5e6})).wait();
   }
   return contract;
 };

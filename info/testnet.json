@@ -19,7 +19,9 @@
     "tokenName": "Avax",
     "tokenSymbol": "AVAX",
     "executableSample": "0x92031E88f3beD344f3c88d17900de0E71C5A28d4",
-    "constAddressDeployer": "0xb8f04f4f4553Ef8458b38a9CE8cCFB26d439A698"
+    "constAddressDeployer": "0x93531805333D3d9d70E365C9Cd87A3bC66e5f17d",
+    "storageLogger": "0x353A74a7f6786952F8b598F265C83262C9e534f0",
+    "headers": "0xD7960Ee3D0A7203a3b0692Dd17e159338748b0e1"
   },
   {
     "name": "Fantom",

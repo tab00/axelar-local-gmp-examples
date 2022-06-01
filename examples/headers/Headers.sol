@@ -18,19 +18,21 @@ contract Headers {
     using AddressFormat for address;
 
     IAxelarGateway public gateway;
+    address public storageLogger;
     mapping(string => bytes32) public stateRoots;
     mapping(string => bytes32) public storageRoots;
     mapping(string => uint256) public blockNumbers;
     mapping(string => uint256) public timestamps;
 
-    uint256 public constant STATE_POS = 123;
-    uint256 public constant NUMBER_POS = 55;
-    uint256 public constant TIMESTAMP_POS = 55;
+    uint256 public constant STATE_POS = 3;
+    uint256 public constant NUMBER_POS = 8;
+    uint256 public constant TIMESTAMP_POS = 11;
 
     //We need to know where the gateway is as well as where the gasReceiver is. length_ is the maximum number of headers to cache per chain.
-    function init(address gateway_) external {
+    function init(address gateway_, address storageLogger_) external {
         if(address(gateway) != address(0)) revert AlreadyInitialized();
         gateway = IAxelarGateway(gateway_);
+        storageLogger = storageLogger_;
     }
 
     function updateRemoteHeaders (
@@ -54,28 +56,19 @@ contract Headers {
     ) {
         RLPReader.RLPItem memory item = RLPReader.toRlpItem(header);
         RLPReader.RLPItem[] memory list = RLPReader.toList(item);
-        timestamp_ = RLPReader.toUint(list[11]);
-        blockNumber = RLPReader.toUint(list[8]);
+        timestamp_ = RLPReader.toUint(list[TIMESTAMP_POS]);
+        blockNumber = RLPReader.toUint(list[NUMBER_POS]);
         stateHash_ = bytes32(
-            RLPReader.toUint(list[3])
+            RLPReader.toUint(list[STATE_POS])
         );
     }
 
-    function getEncodedPath() public view returns(bytes memory encodedPath) {
-        encodedPath = new bytes(33);
-        encodedPath[0] = bytes1(uint8(32));
-        bytes32 addressHash = keccak256(abi.encodePacked(address(this)));
-        assembly{
-            mstore(add(encodedPath, 33), addressHash)
-        }
-    }
-
     function receiveHeader(
-        bytes32 commandId, 
+        bytes32 /*commandId*/, 
         string calldata chain,
         bytes32 blockHash,
         bytes calldata blockHeader,
-        bytes calldata encodedPath,
+        address receipientAddress,
         bytes[] memory rlpParentNodes
     ) external {
         if( keccak256(blockHeader) != blockHash )
@@ -90,7 +83,7 @@ contract Headers {
             blockNumbers[chain]
         ) = _extractData(blockHeader);
         stateRoots[chain] = stateRoot;
-        //bytes memory encodedPath = getEncodedPath();
+        bytes memory encodedPath = getNibblesForAddress(receipientAddress);
         bytes memory val = MerklePatriciaProof.get(encodedPath, rlpParentNodes, stateRoot);
 
         RLPReader.RLPItem[] memory list = RLPReader.toList(RLPReader.toRlpItem(val));
@@ -106,7 +99,23 @@ contract Headers {
         }
     }
 
-    function getStorageAt(string memory chain, uint256 pos, bytes[] memory rlpParentNodes) external view returns (bytes memory){
-        return MerklePatriciaProof.get(getNibblesForPos(pos), rlpParentNodes, storageRoots[chain]);
+    function getNibblesForAddress(address add) public pure returns (bytes memory encoded) {
+        encoded = new bytes(33);
+        encoded[0] = bytes1(uint8(32));
+        bytes32 hashed = keccak256(abi.encodePacked(add));
+        assembly {
+            mstore(add(encoded,33), hashed)
+        }
+    }
+
+    function temp(string memory chain, bytes32 storageRoot) external {
+        storageRoots[chain] = storageRoot;
+    }
+
+
+    function getStorageAt(string memory chain, uint256 pos, bytes[] memory rlpParentNodes) external view returns (bytes32){
+        bytes memory val = MerklePatriciaProof.get(getNibblesForPos(pos), rlpParentNodes, storageRoots[chain]);
+        RLPReader.RLPItem memory item= RLPReader.toRlpItem(val);
+        return bytes32(RLPReader.toUint(item));
     }
 }

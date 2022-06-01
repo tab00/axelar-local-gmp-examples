@@ -48,7 +48,6 @@ library MerklePatriciaProof {
         pathPtr += 1;
       } else if (currentNodeList.length == 2) {
         pathPtr += _nibblesToTraverse(RLPReader.toBytes(currentNodeList[0]), path, pathPtr);
-
         if (pathPtr == path.length) {//leaf node
           //return RLPReader.toBytes(currentNodeList[1]);
           return RLPReader.toBytes(currentNodeList[1]);

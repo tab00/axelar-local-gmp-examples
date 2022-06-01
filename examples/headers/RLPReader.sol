@@ -201,7 +201,6 @@ library RLPReader {
         assembly {
             destPtr := add(0x20, result)
         }
-
         copy(item.memPtr + offset, destPtr, len);
         return result;
     }
@@ -301,7 +300,7 @@ library RLPReader {
             src += WORD_SIZE;
             dest += WORD_SIZE;
         }
-
+        if(len == 0) return;
         // left over bytes. Mask is used to remove unwanted bytes from the word
         uint mask = 256 ** (WORD_SIZE - len) - 1;
         assembly {
