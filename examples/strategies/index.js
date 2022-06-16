@@ -1,7 +1,7 @@
 'use strict';
 
 const { getDefaultProvider, Contract, constants: { AddressZero } } = require('ethers');
-const { deployContractConstant } = require('../../scripts/utils.js');
+const { deployContractConstant } = require('axelar-utils-solidity');
 
 const StrategySub = require('../../build/StrategyStub.json');
 const Strategy = require('../../build/Strategy.json');
