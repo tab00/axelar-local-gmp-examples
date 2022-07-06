@@ -4,7 +4,7 @@ const {
     getDefaultProvider,
     Contract,
     constants: { AddressZero },
-    utils: { formatBytes32String, arrayify, defaultAbiCoder }
+    utils: { formatBytes32String, arrayify, defaultAbiCoder },
 } = require('ethers');
 const {
     utils: { deployContract },
@@ -21,7 +21,7 @@ async function deploy(chain, wallet) {
     chain.depositService = depositImplementation.address;
     const depositProxy = await deployContract(wallet, DepositServiceProxy, [
         depositImplementation.address,
-        arrayify(defaultAbiCoder.encode(['address', 'string'], [chain.gateway, "aUSDC"])),
+        arrayify(defaultAbiCoder.encode(['address', 'string'], [chain.gateway, 'aUSDC'])),
     ]);
     chain.depositProxy = depositProxy.address;
     console.log(`Deployed DepositService for ${chain.name} at ${chain.depositService}.`);
@@ -31,7 +31,7 @@ async function test(chains, wallet, options) {
     const args = options.args || [];
     const getGasPrice = options.getGasPrice;
     const symbol = 'aUSDC';
-    const destinationAddress = "0xA57ADCE1d2fE72949E4308867D894CD7E7DE0ef2";
+    const destinationAddress = '0xA57ADCE1d2fE72949E4308867D894CD7E7DE0ef2';
     const amount = 5000000;
 
     for (const chain of chains) {
@@ -60,10 +60,10 @@ async function test(chains, wallet, options) {
     console.log('--- Initially ---');
     await print();
 
-    const salt = formatBytes32String("Hello");
-    const depositAddress = await source.depositServiceContract.depositAddressForSendToken(salt, "Moonbeam", destinationAddress, "aUSDC")
+    const salt = formatBytes32String('Hello');
+    const depositAddress = await source.depositServiceContract.depositAddressForSendToken(salt, 'Moonbeam', destinationAddress, 'aUSDC');
 
-    console.log("deposit Address", depositAddress)
+    console.log('deposit Address', depositAddress);
 
     const balance = await destination.token.balanceOf(destinationAddress);
     console.log('--- Initially ---');
@@ -74,9 +74,9 @@ async function test(chains, wallet, options) {
     await (await source.token.approve(source.depositProxy, amount)).wait();
     await (await source.token.approve(source.gateway, amount)).wait();
     // return;
-    console.log("deposit service contract",source.depositServiceContract)
+    console.log('deposit service contract', source.depositServiceContract);
 
-    await (await source.depositServiceContract.sendToken(salt, "Moonbeam", destinationAddress, "aUSDC")).wait();
+    await (await source.depositServiceContract.sendToken(salt, 'Moonbeam', destinationAddress, 'aUSDC')).wait();
     while (true) {
         const newBalance = await destination.token.balanceOf(destinationAddress);
         if (BigInt(balance) != BigInt(newBalance)) break;
