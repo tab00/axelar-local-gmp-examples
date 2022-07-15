@@ -1,5 +1,7 @@
 require('hardhat-gas-reporter');
 require('solidity-coverage');
+require('@openzeppelin/hardhat-upgrades');
+require('dotenv').config()
 
 /**
  * @type import('hardhat/config').HardhatUserConfig
@@ -30,5 +32,41 @@ module.exports = {
     },
     paths: {
         sources: "./examples",
-    }
+    },
+    networks: {
+        moonbeam: {
+            accounts: getAccounts(),
+            "name": "Moonbeam",
+            "chainId": 2500,
+            "url": "http://localhost:8500/0",
+        },
+        avalanche: {
+            accounts: getAccounts(),
+            "name": "Avalanche",
+            "chainId": 2501,
+            "url": "http://localhost:8500/1",
+        },
+        fantom: {
+            accounts: getAccounts(),
+            "name": "Fantom",
+            "chainId": 2502,
+            "url": "http://localhost:8500/2",
+        },
+        ethereum: {
+            accounts: getAccounts(),
+            "name": "Ethereum",
+            "chainId": 2503,
+            "url": "http://localhost:8500/3",
+        },
+        polygon: {
+            accounts: getAccounts(),
+            "name": "Polygon",
+            "chainId": 2504,
+            "url": "http://localhost:8500/4",
+        },
+    },
 };
+
+function getAccounts() {
+    return [process.env.PRIVATE_KEY];
+}

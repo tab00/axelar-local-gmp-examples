@@ -13,7 +13,7 @@ const name = 'An Awesome Axelar Cross Chain Token';
 const symbol = 'AACCT';
 const decimals = 13;
 
-async function deploy(chain, wallet) {
+async function deploy(chain, wallet) { // Called when running node scripts/deploy examples/cross-chain-token local . To use ERC20CrossChainUpgradeable instead of ERC20CrossChain run npx hardhat run --network [network] scripts/deployUpgradeable.js
     console.log(`Deploying ERC20CrossChain for ${chain.name}.`);
     const contract = await deployAndInitContractConstant(
         chain.constAddressDeployer,
@@ -33,6 +33,7 @@ async function test(chains, wallet, options) {
     for (const chain of chains) {
         const provider = getDefaultProvider(chain.rpc);
         chain.wallet = wallet.connect(provider);
+        if(args[3]) chain.crossChainToken = args[3] // args[3] has ERC20CrossChainUpgradeable contract address. Deployed manually using npx hardhat run --network [network] scripts/deployUpgradeable.js
         chain.contract = new Contract(chain.crossChainToken, ERC20CrossChain.abi, chain.wallet);
     }
     const source = chains.find((chain) => chain.name == (args[0] || 'Avalanche'));

@@ -9,3 +9,9 @@ scripts/deployConst.js
 
 
 .DS_Store
+
+.env
+coverage
+coverage.json
+.openzeppelin
+local.json

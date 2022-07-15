@@ -46,9 +46,10 @@ if (require.main === module) {
     }
     const chains = temp;
 
-    //0x8ff26335325ad2c33d87bf8be4a53f28abaac5cf654a42080bc2b91938b1281d
-    const private_key = keccak256(defaultAbiCoder.encode(['string'], ['this is a random string to get a random account. You need to provide the private key for a funded account here.']));
+    require('dotenv').config()
+    const private_key = process.env.PRIVATE_KEY
     const wallet = new Wallet(private_key);
+    console.log(`In scripts/deploy. wallet.address: ${wallet.address}`);
 
     deploy(env, chains, wallet, example);
 }

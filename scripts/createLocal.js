@@ -21,8 +21,10 @@ module.exports = {
 }
 
 if (require.main === module) {    
-    const deployer_key = keccak256(defaultAbiCoder.encode(['string'], ['this is a random string to get a random account. You need to provide the private key for a funded account here.']));
+    require('dotenv').config()
+    const deployer_key = process.env.PRIVATE_KEY
     const deployer_address = new Wallet(deployer_key).address;
+    console.log(`In scripts/createLocal. deployer_address: ${deployer_address}`);
     const toFund = [deployer_address]
 
     for(let j=2; j<process.argv.length; j++) {
